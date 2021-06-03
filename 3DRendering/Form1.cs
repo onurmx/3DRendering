@@ -16,8 +16,8 @@ namespace _3DRendering
         Calculate Calculate = new Calculate();
         double theta = 5 * Math.PI / 180;
 
-        double angX = 0;
-        double angY = 0;
+        double angleX = 0;
+        double angleY = 0;
         float scale = 1;
 
         int mesh = 30;
@@ -43,19 +43,19 @@ namespace _3DRendering
             switch (keyData)
             {
                 case Keys.Left:
-                    angY -= theta;
+                    angleY -= theta;
                     Draw();
                     break;
                 case Keys.Right:
-                    angY += theta;
+                    angleY += theta;
                     Draw();
                     break;
                 case Keys.Up:
-                    angX += theta;
+                    angleX += theta;
                     Draw();
                     break;
                 case Keys.Down:
-                    angX -= theta;
+                    angleX -= theta;
                     Draw();
                     break;
             }
@@ -89,12 +89,12 @@ namespace _3DRendering
                                                                               1,
                                                                               0),
                                                                   (Math.PI / 3),
-                                                                  angX,
-                                                                  angY,
+                                                                  angleX,
+                                                                  angleY,
                                                                   scale);
             for (int i = 0; i < 4 * cylinder.n + 2; i++)
             {
-                cylinder.vertices[i].pv = Calculate.MyMultiply(cylinder.vertices[i].pv, M);
+                cylinder.vertices[i].pv = Calculate.Multiply(cylinder.vertices[i].pv, M);
                 cylinder.vertices[i].pv /= cylinder.vertices[i].pv.W;
                 cylinder.vertices[i].pv.CopyTo(cylinder.vertices[i].p);
             }
@@ -103,6 +103,23 @@ namespace _3DRendering
 
             cylinder = new Cylinder(h, r, mesh);
             pictureBox1.Image = bitmap;
+        }
+
+        private void FillCylinderTriangles(Bitmap bitmap)
+        {
+            List<Point> trianglePoints = new List<Point>();
+            foreach(var triangle in cylinder.triangles)
+            {
+                switch (BackFaceCulling(triangle))
+                {
+                    case true:
+                        trianglePoints.Add(new Point((int)triangle.vertices[0].pv.X, (int)triangle.vertices[0].pv.Y));
+                        trianglePoints.Add(new Point((int)triangle.vertices[1].pv.X, (int)triangle.vertices[1].pv.Y));
+                        trianglePoints.Add(new Point((int)triangle.vertices[2].pv.X, (int)triangle.vertices[2].pv.Y));
+                        //Filling.FillPolygon(trianglePoints, bitmap);
+                        continue;
+                }
+            }
         }
 
         private void DrawCylinderTriangles(Bitmap bitmap)

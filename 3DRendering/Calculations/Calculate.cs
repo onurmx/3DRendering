@@ -15,16 +15,16 @@ namespace _3DRendering
                                                        Vector3 cPos,
                                                        Vector3 cUp,
                                                        double FoV,
-                                                       double angX,
-                                                       double angY,
+                                                       double angleX,
+                                                       double angleY,
                                                        float scale)
         {
             Matrix4x4 model = Model(sx, sy);
             Matrix4x4 CVM = CameraView(cTarget, cPos, cUp);
             Matrix4x4 PPM = PerspectiveProjection(sx, sy, FoV);
 
-            Matrix4x4 rotX = RotationX(angX);
-            Matrix4x4 rotY = RotationY(angY);
+            Matrix4x4 rotX = RotationX(angleX);
+            Matrix4x4 rotY = RotationY(angleY);
             Matrix4x4 scaling = Scaling(scale);
             Matrix4x4 trans1 = Trans1();
 
@@ -80,21 +80,21 @@ namespace _3DRendering
             return M;
         }
 
-        private Matrix4x4 RotationX(double angX)
+        private Matrix4x4 RotationX(double angleX)
         {
-            Matrix4x4 M = new Matrix4x4(1,                     0,                        0, 0,
-                                        0, (float)Math.Cos(angX), (float)(-Math.Sin(angX)), 0,
-                                        0, (float)Math.Sin(angX),    (float)Math.Cos(angX), 0,
-                                        0,                     0,                        0, 1);
+            Matrix4x4 M = new Matrix4x4(1,                       0,                          0, 0,
+                                        0, (float)Math.Cos(angleX), (float)(-Math.Sin(angleX)), 0,
+                                        0, (float)Math.Sin(angleX),    (float)Math.Cos(angleX), 0,
+                                        0,                       0,                          0, 1);
             return M;
         }
 
-        private Matrix4x4 RotationY(double angY)
+        private Matrix4x4 RotationY(double angleY)
         {
-            Matrix4x4 M = new Matrix4x4(   (float)Math.Cos(angY), 0, (float)Math.Sin(angY), 0,
-                                                               0, 1,                     0, 0,
-                                        (float)(-Math.Sin(angY)), 0, (float)Math.Cos(angY), 0,
-                                                               0, 0,                     0, 1);
+            Matrix4x4 M = new Matrix4x4(   (float)Math.Cos(angleY), 0, (float)Math.Sin(angleY), 0,
+                                                                 0, 1,                       0, 0,
+                                        (float)(-Math.Sin(angleY)), 0, (float)Math.Cos(angleY), 0,
+                                                                 0, 0,                       0, 1);
             return M;
         }
 
@@ -116,13 +116,13 @@ namespace _3DRendering
             return M;
         }
 
-        public Vector4 MyMultiply(Vector4 self, Matrix4x4 matrix)
+        public Vector4 Multiply(Vector4 a, Matrix4x4 matrix)
         {
             return new Vector4(
-                matrix.M11 * self.X + matrix.M12 * self.Y + matrix.M13 * self.Z + matrix.M14 * self.W,
-                matrix.M21 * self.X + matrix.M22 * self.Y + matrix.M23 * self.Z + matrix.M24 * self.W,
-                matrix.M31 * self.X + matrix.M32 * self.Y + matrix.M33 * self.Z + matrix.M34 * self.W,
-                matrix.M41 * self.X + matrix.M42 * self.Y + matrix.M43 * self.Z + matrix.M44 * self.W
+                matrix.M11 * a.X + matrix.M12 * a.Y + matrix.M13 * a.Z + matrix.M14 * a.W,
+                matrix.M21 * a.X + matrix.M22 * a.Y + matrix.M23 * a.Z + matrix.M24 * a.W,
+                matrix.M31 * a.X + matrix.M32 * a.Y + matrix.M33 * a.Z + matrix.M34 * a.W,
+                matrix.M41 * a.X + matrix.M42 * a.Y + matrix.M43 * a.Z + matrix.M44 * a.W
             );
         }
     }

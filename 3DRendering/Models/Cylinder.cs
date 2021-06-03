@@ -10,19 +10,19 @@ namespace _3DRendering
     public class Cylinder
     {
         public int n;
-        public Vertex[] vertices = null;
-        public Triangle[] triangles = null;
+        public Vertex[] vertices;
+        public Triangle[] triangles;
 
-        public Cylinder(double h, double r, int mesh)
+        public Cylinder(double h, double r, int numberOfMesh)
         {
-            n = mesh;
+            n = numberOfMesh;
 
             // Create mesh
-            int numOfVertices = 4 * n + 2;
-            int numOfTriangles = 4 * n;
+            int numberOfVertices = 4 * n + 2;
+            int numberOfTriangles = 4 * n;
 
-            vertices = new Vertex[numOfVertices];
-            triangles = new Triangle[numOfTriangles];
+            vertices = new Vertex[numberOfVertices];
+            triangles = new Triangle[numberOfTriangles];
 
             // Top base
             int[] normal = { 0, 1, 0, 0 };
