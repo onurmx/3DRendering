@@ -9,15 +9,15 @@ namespace _3DRendering
 {
     public class Calculate
     {
-        public Matrix4x4 CreateTransformationMatrix(float sx,
-                                                    float sy,
-                                                    Vector3 cTarget,
-                                                    Vector3 cPos,
-                                                    Vector3 cUp,
-                                                    double FoV,
-                                                    double angX,
-                                                    double angY,
-                                                    float scale)
+        public Matrix4x4 CalculateTransformationMatrix(float sx,
+                                                       float sy,
+                                                       Vector3 cTarget,
+                                                       Vector3 cPos,
+                                                       Vector3 cUp,
+                                                       double FoV,
+                                                       double angX,
+                                                       double angY,
+                                                       float scale)
         {
             Matrix4x4 model = Model(sx, sy);
             Matrix4x4 CVM = CameraView(cTarget, cPos, cUp);

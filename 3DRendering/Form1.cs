@@ -33,6 +33,7 @@ namespace _3DRendering
         private void Form1_Load(object sender, EventArgs e)
         {
             pictureBox1.Image = new Bitmap(pictureBox1.Width, pictureBox1.Height);
+
             cylinder = new Cylinder(h, r, mesh);
             Draw();
         }
@@ -76,21 +77,21 @@ namespace _3DRendering
         private void Draw()
         {
             Bitmap bitmap = new Bitmap(pictureBox1.Width, pictureBox1.Height);
-            Matrix4x4 M = Calculate.CreateTransformationMatrix(pictureBox1.Width,
-                                                               pictureBox1.Height,
-                                                               new Vector3(pictureBox1.Width / 2,
-                                                                           pictureBox1.Height / 2,
-                                                                           0),
-                                                               new Vector3(0,
-                                                                           0,
-                                                                           0),
-                                                               new Vector3(0,
-                                                                           1,
-                                                                           0),
-                                                               (Math.PI / 3),
-                                                               angX,
-                                                               angY,
-                                                               scale);
+            Matrix4x4 M = Calculate.CalculateTransformationMatrix(pictureBox1.Width,
+                                                                  pictureBox1.Height,
+                                                                  new Vector3(pictureBox1.Width / 2,
+                                                                              pictureBox1.Height / 2,
+                                                                              0),
+                                                                  new Vector3(0,
+                                                                              0,
+                                                                              0),
+                                                                  new Vector3(0,
+                                                                              1,
+                                                                              0),
+                                                                  (Math.PI / 3),
+                                                                  angX,
+                                                                  angY,
+                                                                  scale);
             for (int i = 0; i < 4 * cylinder.n + 2; i++)
             {
                 cylinder.vertices[i].pv = Calculate.MyMultiply(cylinder.vertices[i].pv, M);
@@ -98,41 +99,42 @@ namespace _3DRendering
                 cylinder.vertices[i].pv.CopyTo(cylinder.vertices[i].p);
             }
             cylinder.CreateTriangles();
-            bitmap = DrawCylinderTriangles(bitmap);
+            DrawCylinderTriangles(bitmap);
 
             cylinder = new Cylinder(h, r, mesh);
             pictureBox1.Image = bitmap;
         }
 
-        private Bitmap DrawCylinderTriangles(Bitmap cbmp)
+        private void DrawCylinderTriangles(Bitmap bitmap)
         {
-            Pen pen = new Pen(System.Drawing.Color.LightSeaGreen);
+            Pen pen = new Pen(Color.LightSeaGreen);
             Point[] trianglePoints = new Point[3];
             foreach (var triangle in cylinder.triangles)
             {
-                if (BackFaceCulling(triangle))
+                switch (BackFaceCulling(triangle))
                 {
-                    trianglePoints[0] = new Point((int)triangle.vertices[0].pv.X, (int)triangle.vertices[0].pv.Y);
-                    trianglePoints[1] = new Point((int)triangle.vertices[1].pv.X, (int)triangle.vertices[1].pv.Y);
-                    trianglePoints[2] = new Point((int)triangle.vertices[2].pv.X, (int)triangle.vertices[2].pv.Y);
-                    using (var graphics = Graphics.FromImage(cbmp))
-                    {
-                        graphics.DrawLines(pen, trianglePoints);
-                    }
+                    case true:
+                        trianglePoints[0] = new Point((int)triangle.vertices[0].pv.X, (int)triangle.vertices[0].pv.Y);
+                        trianglePoints[1] = new Point((int)triangle.vertices[1].pv.X, (int)triangle.vertices[1].pv.Y);
+                        trianglePoints[2] = new Point((int)triangle.vertices[2].pv.X, (int)triangle.vertices[2].pv.Y);
+                        using (var graphics = Graphics.FromImage(bitmap))
+                        {
+                            graphics.DrawLines(pen, trianglePoints);
+                        }
+                        continue;
                 }
             }
-            return cbmp;
         }
 
-        private bool BackFaceCulling(Triangle t)
+        private bool BackFaceCulling(Triangle triangle)
         {
-            Vector3 v1 = new Vector3(t.vertices[1].pv.X - t.vertices[0].pv.X,
-                                     t.vertices[1].pv.Y - t.vertices[0].pv.Y,
-                                                                           0);
+            Vector3 v1 = new Vector3(triangle.vertices[1].pv.X - triangle.vertices[0].pv.X,
+                                     triangle.vertices[1].pv.Y - triangle.vertices[0].pv.Y,
+                                                                                         0);
 
-            Vector3 v2 = new Vector3(t.vertices[2].pv.X - t.vertices[0].pv.X,
-                                     t.vertices[2].pv.Y - t.vertices[0].pv.Y,
-                                                                           0);
+            Vector3 v2 = new Vector3(triangle.vertices[2].pv.X - triangle.vertices[0].pv.X,
+                                     triangle.vertices[2].pv.Y - triangle.vertices[0].pv.Y,
+                                                                                         0);
 
             Vector3 res = Vector3.Cross(v1, v2);
 
