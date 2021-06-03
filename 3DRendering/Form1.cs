@@ -32,9 +32,19 @@ namespace _3DRendering
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            checkBox1.Checked = true;
+            checkBox2.Checked = true;
+            checkBox1.CheckStateChanged += CheckBox_CheckStateChanged;
+            checkBox2.CheckStateChanged += CheckBox_CheckStateChanged;
+
             pictureBox1.Image = new Bitmap(pictureBox1.Width, pictureBox1.Height);
 
             cylinder = new Cylinder(h, r, mesh);
+            Draw();
+        }
+
+        private void CheckBox_CheckStateChanged(object sender, EventArgs e)
+        {
             Draw();
         }
 
@@ -99,7 +109,17 @@ namespace _3DRendering
                 cylinder.vertices[i].pv.CopyTo(cylinder.vertices[i].p);
             }
             cylinder.CreateTriangles();
-            DrawCylinderTriangles(bitmap);
+
+            if (checkBox2.Checked)
+            {
+                FillCylinderTriangles(bitmap);
+            }
+            if (checkBox1.Checked)
+            {
+                DrawCylinderTriangles(bitmap);
+            }
+            
+            
 
             cylinder = new Cylinder(h, r, mesh);
             pictureBox1.Image = bitmap;
@@ -107,16 +127,20 @@ namespace _3DRendering
 
         private void FillCylinderTriangles(Bitmap bitmap)
         {
-            List<Point> trianglePoints = new List<Point>();
-            foreach(var triangle in cylinder.triangles)
+            SolidBrush solidBrush = new SolidBrush(Color.Red);
+            Point[] trianglePoints = new Point[3];
+            foreach (var triangle in cylinder.triangles)
             {
                 switch (BackFaceCulling(triangle))
                 {
                     case true:
-                        trianglePoints.Add(new Point((int)triangle.vertices[0].pv.X, (int)triangle.vertices[0].pv.Y));
-                        trianglePoints.Add(new Point((int)triangle.vertices[1].pv.X, (int)triangle.vertices[1].pv.Y));
-                        trianglePoints.Add(new Point((int)triangle.vertices[2].pv.X, (int)triangle.vertices[2].pv.Y));
-                        //Filling.FillPolygon(trianglePoints, bitmap);
+                        trianglePoints[0] = new Point((int)triangle.vertices[0].pv.X, (int)triangle.vertices[0].pv.Y);
+                        trianglePoints[1] = new Point((int)triangle.vertices[1].pv.X, (int)triangle.vertices[1].pv.Y);
+                        trianglePoints[2] = new Point((int)triangle.vertices[2].pv.X, (int)triangle.vertices[2].pv.Y);
+                        using (var graphics = Graphics.FromImage(bitmap))
+                        {
+                            graphics.FillPolygon(solidBrush, trianglePoints);
+                        }
                         continue;
                 }
             }
