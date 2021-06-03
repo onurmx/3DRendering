@@ -14,15 +14,16 @@ namespace _3DRendering
     public partial class Form1 : Form
     {
         Calculate Calculate = new Calculate();
+        double theta = 5 * Math.PI / 180;
 
         double angX = 0;
         double angY = 0;
         float scale = 1;
 
+        int mesh = 30;
         double h = 100;
         double r = 50;
         Cylinder cylinder;
-
 
         public Form1()
         {
@@ -32,11 +33,47 @@ namespace _3DRendering
         private void Form1_Load(object sender, EventArgs e)
         {
             pictureBox1.Image = new Bitmap(pictureBox1.Width, pictureBox1.Height);
-            cylinder = new Cylinder(h, r);
-            TestDraw();
+            cylinder = new Cylinder(h, r, mesh);
+            Draw();
         }
 
-        private void TestDraw()
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            switch (keyData)
+            {
+                case Keys.Left:
+                    angY -= theta;
+                    Draw();
+                    break;
+                case Keys.Right:
+                    angY += theta;
+                    Draw();
+                    break;
+                case Keys.Up:
+                    angX += theta;
+                    Draw();
+                    break;
+                case Keys.Down:
+                    angX -= theta;
+                    Draw();
+                    break;
+            }
+            return base.ProcessCmdKey(ref msg, keyData);
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            scale += 0.1f;
+            Draw();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            scale -= 0.1f;
+            Draw();
+        }
+
+        private void Draw()
         {
             Bitmap bitmap = new Bitmap(pictureBox1.Width, pictureBox1.Height);
             Matrix4x4 M = Calculate.CreateTransformationMatrix(pictureBox1.Width,
@@ -61,29 +98,10 @@ namespace _3DRendering
                 cylinder.vertices[i].pv.CopyTo(cylinder.vertices[i].p);
             }
             cylinder.CreateTriangles();
-            bitmap = DrawCylinderVertices(bitmap);
             bitmap = DrawCylinderTriangles(bitmap);
 
-            cylinder = new Cylinder(h, r);
+            cylinder = new Cylinder(h, r, mesh);
             pictureBox1.Image = bitmap;
-        }
-
-        private Bitmap DrawCylinderVertices(Bitmap cbmp)
-        {
-            Color color = Color.Black;
-            int x, y;
-
-            foreach (var vertex in cylinder.vertices)
-            {
-                x = (int)vertex.p[0];
-                y = (int)vertex.p[1];
-                if (x > 0 && x < cbmp.Width && y > 0 && y < cbmp.Height)
-                {
-                    cbmp.SetPixel(x, y, color);
-                }
-            }
-
-            return cbmp;
         }
 
         private Bitmap DrawCylinderTriangles(Bitmap cbmp)
@@ -118,10 +136,7 @@ namespace _3DRendering
 
             Vector3 res = Vector3.Cross(v1, v2);
 
-            if (res.Z < 0)
-                return true;
-            else
-                return false;
+            return res.Z < 0 ? true : false;
         }
     }
 }
